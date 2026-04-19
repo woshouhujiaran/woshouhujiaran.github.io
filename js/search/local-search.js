@@ -103,14 +103,16 @@ class LocalSearch {
 
   getResultItems (keywords) {
     const resultItems = []
-    this.datas.forEach(({ title, content, url }) => {
+    this.datas.forEach(({ title, content, url, category, tags }) => {
       // The number of different keywords included in the article.
       const [indexOfTitle, keysOfTitle] = this.getIndexByWord(keywords, title)
       const [indexOfContent, keysOfContent] = this.getIndexByWord(keywords, content)
-      const includedCount = new Set([...keysOfTitle, ...keysOfContent]).size
+      const metaText = [category || '', ...Array.isArray(tags) ? tags : []].join(' ').trim()
+      const [indexOfMeta, keysOfMeta] = this.getIndexByWord(keywords, metaText)
+      const includedCount = new Set([...keysOfTitle, ...keysOfContent, ...keysOfMeta]).size
 
       // Show search results
-      const hitCount = indexOfTitle.length + indexOfContent.length
+      const hitCount = indexOfTitle.length + indexOfContent.length + indexOfMeta.length
       if (hitCount === 0) return
 
       const slicesOfTitle = []
@@ -159,6 +161,13 @@ class LocalSearch {
         resultItem += `<p class="search-result">${this.highlightKeyword(content, slice)}...</p>`
       })
 
+      if (metaText) {
+        const metaDisplay = indexOfMeta.length
+          ? this.highlightKeyword(metaText, this.mergeIntoSlice(0, metaText.length, [...indexOfMeta]))
+          : metaText
+        resultItem += `<p class="search-result-meta">${metaDisplay}</p>`
+      }
+
       resultItem += '</a></li>'
       resultItems.push({
         item: resultItem,
@@ -181,7 +190,9 @@ class LocalSearch {
           ? [...new DOMParser().parseFromString(res, 'text/xml').querySelectorAll('entry')].map(element => ({
               title: element.querySelector('title').textContent,
               content: element.querySelector('content').textContent,
-              url: element.querySelector('url').textContent
+              url: element.querySelector('url').textContent,
+              category: element.querySelector('category')?.textContent || '',
+              tags: [...element.querySelectorAll('tags > tag')].map(tag => tag.textContent || '')
             }))
           : JSON.parse(res)
         // Only match articles with non-empty titles
@@ -189,6 +200,8 @@ class LocalSearch {
           data.title = data.title.trim()
           data.content = data.content ? data.content.trim().replace(/<[^>]+>/g, '') : ''
           data.url = decodeURIComponent(data.url).replace(/\/{2,}/g, '/')
+          data.category = data.category ? data.category.trim() : ''
+          data.tags = Array.isArray(data.tags) ? data.tags.map(tag => tag.trim()).filter(Boolean) : []
           return data
         })
         // Remove loading animation
