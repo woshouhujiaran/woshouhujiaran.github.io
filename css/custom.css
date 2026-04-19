@@ -182,3 +182,16 @@ maxWidth768()
   background: #4f8cff;
   color: #fff;
 }
+/* Homepage hero: stable ratio + stronger transparency mask */
+body[data-type='index'] #page-header.full_page {
+  height: clamp(360px, 56.25vw, 780px) !important;
+  min-height: clamp(360px, 56.25vw, 780px);
+  background-size: cover !important;
+  background-position: center center !important;
+}
+body[data-type='index'] #page-header.full_page:before {
+  background: linear-gradient(180deg, rgba(9,14,26,0.48), rgba(9,14,26,0.28)) !important;
+}
+body[data-type='index'] #site-info {
+  text-shadow: 0 8px 24px rgba(0,0,0,0.38);
+}
