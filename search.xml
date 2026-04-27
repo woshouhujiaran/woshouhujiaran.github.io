@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>力扣题解：盛最多水的容器</title>
+      <link href="/2026/04/27/sheng-zui-duo-shui-de-rong-qi/"/>
+      <url>/2026/04/27/sheng-zui-duo-shui-de-rong-qi/</url>
+      
+        <content type="html"><![CDATA[<h1 id="力扣题解：盛最多水的容器"><a href="#力扣题解：盛最多水的容器" class="headerlink" title="力扣题解：盛最多水的容器"></a>力扣题解：盛最多水的容器</h1><h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="https://leetcode.cn/problems/container-with-most-water/?envType=study-plan-v2&envId=top-100-liked">点击查看题目</a></p><hr><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>这段代码使用了<strong>双指针</strong>：一个指针 <code>l</code> 在左端，一个指针 <code>r</code> 在右端。每次用两端高度计算当前能装的水量，并更新最大值，然后移动较短的一侧继续尝试。</p><ol><li><p>初始化：<br><code>l = 0</code>，<code>r = height.size() - 1</code>，<code>ans = 0</code>。<br>其中 <code>ans</code> 用于记录遍历过程中出现的最大面积。</p></li><li><p>循环条件是 <code>l &lt; r</code>，只要左右指针没有相遇就继续计算。<br>当前面积计算为：<br><code>area = min(height[l], height[r]) * (r - l)</code><br>含义是：容器高度由短板决定，宽度是两指针之间的距离。</p></li><li><p>用 <code>ans = max(ans, area)</code> 持续更新最大面积。</p></li><li><p>决定移动哪一侧指针：</p></li></ol><ul><li>如果 <code>height[l] &lt;= height[r]</code>，移动左指针 <code>l++</code></li><li>否则移动右指针 <code>r--</code></li></ul><p>关键原因是：面积受短板限制，移动较高的一侧通常不会让短板变大，反而会让宽度变小；只有移动较短的一侧，才有机会遇到更高的柱子，从而得到更大的面积。</p><ol start="5"><li>循环结束后返回 <code>ans</code>。</li></ol><hr><h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p><code>O(n)</code>。</p><p>左右指针最多各自向中间移动一次，总移动次数不超过 <code>n</code> 级别，所以是线性时间复杂度。</p><h3 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h3><p><code>O(1)</code>。</p><p>只使用了常数个额外变量（<code>l</code>、<code>r</code>、<code>ans</code>、<code>area</code>），没有使用额外数据结构。</p><hr><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">maxArea</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; height)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> l= <span class="number">0</span>,r=height.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">        <span class="type">int</span> ans=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(l&lt;r)&#123;</span><br><span class="line">            <span class="type">int</span> area=<span class="built_in">min</span>(height[l],height[r])*(r-l);</span><br><span class="line">            ans = <span class="built_in">max</span>(ans,area);</span><br><span class="line">            <span class="keyword">if</span>(height[l]&lt;=height[r])&#123;</span><br><span class="line">                l++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                --r;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 分享 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机 </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>雅思写作 Task 1：图表客观描述写作框架</title>
       <link href="/2026/04/23/ya-si-xie-zuo-task1-tu-biao-miao-shu-gui-fan/"/>
       <url>/2026/04/23/ya-si-xie-zuo-task1-tu-biao-miao-shu-gui-fan/</url>
