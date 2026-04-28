@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>力扣题解：三数之和</title>
+      <link href="/2026/04/28/san-shu-zhi-he/"/>
+      <url>/2026/04/28/san-shu-zhi-he/</url>
+      
+        <content type="html"><![CDATA[<h1 id="力扣题解：三数之和"><a href="#力扣题解：三数之和" class="headerlink" title="力扣题解：三数之和"></a>力扣题解：三数之和</h1><h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="https://leetcode.cn/problems/3sum/?envType=study-plan-v2&envId=top-100-liked">点击查看题目</a></p><hr><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>先对数组排序，然后固定第一个数 <code>first</code>，再用 <code>second</code> 从左向右枚举、<code>third</code> 从右向左收缩，寻找 <code>nums[second] + nums[third] == -nums[first]</code> 的组合。</p><ol><li>先排序 <code>nums</code>，这样可以用双指针并且方便去重。</li><li>外层循环固定 <code>first</code>，如果当前值和前一个值相同就跳过，避免重复三元组。</li><li>对每个 <code>first</code>，初始化 <code>third = n - 1</code>，并令 <code>target = -nums[first]</code>。</li><li>内层循环枚举 <code>second</code>：<br>如果 <code>second</code> 与前一个值相同，也跳过，继续去重。</li><li>当 <code>nums[second] + nums[third] &gt; target</code> 时，说明和偏大，移动 <code>third--</code> 让总和变小。</li><li>如果 <code>second == third</code>，说明当前 <code>first</code> 下已经没有可行的右指针位置，直接结束本轮。</li><li>若 <code>nums[second] + nums[third] == target</code>，就找到一个答案，加入 <code>ans</code>。</li></ol><p>关键设计点是：<code>third</code> 指针在同一轮 <code>first</code> 下只会单调左移，不会回退，因此整体效率比三重循环高很多。</p><hr><h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p><code>O(n^2)</code>。</p><p>排序需要 <code>O(n log n)</code>，外层 <code>first</code> 枚举 <code>O(n)</code>，内层 <code>second</code> 与 <code>third</code> 在每轮中总移动次数不超过 <code>O(n)</code>，所以主过程是 <code>O(n^2)</code>，总体为 <code>O(n^2)</code>。</p><h3 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h3><p><code>O(1)</code>（不计答案数组）。</p><p>除结果 <code>ans</code> 外，只使用了若干临时变量；排序是原地排序。</p><hr><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">threeSum</span>(vector&lt;<span class="type">int</span>&gt;&amp; nums) &#123;</span><br><span class="line">        <span class="type">int</span> n=nums.<span class="built_in">size</span>();</span><br><span class="line">        vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;ans;</span><br><span class="line">        <span class="built_in">sort</span>(nums.<span class="built_in">begin</span>(),nums.<span class="built_in">end</span>());</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> first = <span class="number">0</span>;first&lt;n;first++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(first&gt;<span class="number">0</span>&amp;&amp; nums[first]==nums[first<span class="number">-1</span>])&#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">int</span> third=n<span class="number">-1</span>;</span><br><span class="line">            <span class="type">int</span> target = -nums[first];</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> second=first<span class="number">+1</span>;second&lt;n;second++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(second&gt;first<span class="number">+1</span> &amp;&amp; nums[second]==nums[second<span class="number">-1</span>])&#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">while</span>(second&lt;third &amp;&amp; nums[second]+nums[third]&gt;target)&#123;</span><br><span class="line">                    third--;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(second == third)&#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(nums[second]+nums[third] == target)&#123;</span><br><span class="line">                    ans.<span class="built_in">push_back</span>(&#123;nums[first],nums[second],nums[third]&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 分享 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机 </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>新手开发 Skills：从搭建到稳定迭代的实战记录</title>
       <link href="/2026/04/27/xin-shou-kai-fa-skills-zhi-nan/"/>
       <url>/2026/04/27/xin-shou-kai-fa-skills-zhi-nan/</url>
