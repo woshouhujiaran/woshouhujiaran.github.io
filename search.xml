@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>力扣题解：接雨水</title>
+      <link href="/2026/04/30/jie-yu-shui/"/>
+      <url>/2026/04/30/jie-yu-shui/</url>
+      
+        <content type="html"><![CDATA[<h1 id="力扣题解：接雨水"><a href="#力扣题解：接雨水" class="headerlink" title="力扣题解：接雨水"></a>力扣题解：接雨水</h1><h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="https://leetcode.cn/problems/trapping-rain-water/?envType=study-plan-v2&envId=top-100-liked">点击查看题目</a></p><hr><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>一句话总结：先分别预处理每个位置左侧最高柱子和右侧最高柱子，再按 <code>min(左高, 右高) - 当前高度</code> 累加每一格能接的水。</p><p>代码执行流程如下：</p><ol><li>先拿到数组长度 <code>n</code>，如果 <code>n == 0</code> 直接返回 <code>0</code>，避免后续访问越界。</li><li>创建 <code>leftmax</code> 数组，<code>leftmax[i]</code> 表示从左到右到达 <code>i</code> 位置时见过的最高柱子。</li></ol><ul><li><code>leftmax[0] = height[0]</code></li><li>从 <code>i = 1</code> 到 <code>n-1</code>，递推 <code>leftmax[i] = max(leftmax[i-1], height[i])</code></li></ul><ol start="3"><li>创建 <code>rightmax</code> 数组，<code>rightmax[i]</code> 表示从右到左到达 <code>i</code> 位置时见过的最高柱子。</li></ol><ul><li><code>rightmax[n-1] = height[n-1]</code></li><li>从 <code>i = n-2</code> 到 <code>0</code>，递推 <code>rightmax[i] = max(rightmax[i+1], height[i])</code></li></ul><ol start="4"><li>遍历每个位置 <code>i</code>，该位置最多能蓄水的高度上限是两侧较矮的一边：<code>min(leftmax[i], rightmax[i])</code>。</li></ol><ul><li>所以当前位置蓄水量为 <code>min(leftmax[i], rightmax[i]) - height[i]</code></li><li>把每个位置结果累加到 <code>ans</code>。</li></ul><ol start="5"><li>返回总蓄水量 <code>ans</code>。</li></ol><p>关键设计点：</p><ul><li>用两个预处理数组把“每个位置左右最高值”的查询降为 <code>O(1)</code>，从而只需线性遍历一次求总和。</li><li><code>min(leftmax[i], rightmax[i])</code> 体现木桶短板效应，水位由较低的一侧决定。</li></ul><hr><h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p><code>O(n)</code>。</p><p>原因：</p><ul><li>一次循环构建 <code>leftmax</code></li><li>一次循环构建 <code>rightmax</code></li><li>一次循环统计答案</li></ul><p>总计是常数次线性扫描，仍为 <code>O(n)</code>。</p><h3 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h3><p><code>O(n)</code>。</p><p>原因：额外使用了 <code>leftmax</code> 和 <code>rightmax</code> 两个长度为 <code>n</code> 的数组，辅助空间线性增长。</p><hr><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">trap</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; height)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> n = height.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">leftmax</span><span class="params">(n)</span></span>;</span><br><span class="line">        leftmax[<span class="number">0</span>]=height[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>;i&lt;n;i++)&#123;</span><br><span class="line">            leftmax[i]=<span class="built_in">max</span>(leftmax[i<span class="number">-1</span>],height[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">rightmax</span><span class="params">(n)</span></span>;</span><br><span class="line">        rightmax[n<span class="number">-1</span>]=height[n<span class="number">-1</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i= n<span class="number">-2</span>;i&gt;=<span class="number">0</span>;i--)&#123;</span><br><span class="line">            rightmax[i]=<span class="built_in">max</span>(rightmax[i<span class="number">+1</span>],height[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            ans+=<span class="built_in">min</span>(leftmax[i],rightmax[i])-height[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 分享 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机 </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>力扣题解：三数之和</title>
       <link href="/2026/04/28/san-shu-zhi-he/"/>
       <url>/2026/04/28/san-shu-zhi-he/</url>
