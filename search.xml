@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>力扣题解：无重复字符的最长字串</title>
+      <link href="/2026/05/02/wu-zhong-fu-zi-fu-de-zui-chang-zi-chuan/"/>
+      <url>/2026/05/02/wu-zhong-fu-zi-fu-de-zui-chang-zi-chuan/</url>
+      
+        <content type="html"><![CDATA[<h1 id="力扣题解：无重复字符的最长字串"><a href="#力扣题解：无重复字符的最长字串" class="headerlink" title="力扣题解：无重复字符的最长字串"></a>力扣题解：无重复字符的最长字串</h1><h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="https://leetcode.cn/problems/longest-substring-without-repeating-characters/description/?envType=study-plan-v2&envId=top-100-liked">点击查看题目</a></p><hr><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>这份代码使用滑动窗口，窗口区间为 <code>[l, r]</code>，并用 <code>unordered_set&lt;char&gt;</code> 维护窗口内当前出现过的字符。</p><ol><li>初始化</li></ol><ul><li><code>str</code>：记录当前窗口内的字符。</li><li><code>l</code>、<code>r</code>：左右指针，<code>r</code> 负责向右扩展窗口。</li><li><code>ans</code>：记录当前找到的最长无重复子串长度。</li></ul><ol start="2"><li>右指针扩展窗口</li></ol><ul><li>外层循环每次让 <code>r</code> 向右移动一位，把新字符 <code>s[r]</code> 纳入考虑。</li></ul><ol start="3"><li>出现重复时收缩左边界</li></ol><ul><li>如果 <code>s[r]</code> 已经在 <code>str</code> 里，说明当前窗口有重复字符，不符合题意。</li><li>通过 <code>while (l &lt;= r &amp;&amp; str.count(s[r]))</code> 循环不断删除 <code>s[l]</code>，并让 <code>l++</code>，直到窗口重新满足“无重复字符”。</li></ul><ol start="4"><li>更新窗口与答案</li></ol><ul><li>当窗口合法后，将 <code>s[r]</code> 插入集合。</li><li>此时窗口长度为 <code>r - l + 1</code>，用它更新 <code>ans</code>。</li></ul><p>这个过程保证了窗口始终尽量大且合法，因此能在线性时间内得到最优解。</p><hr><h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p><code>O(n)</code>。</p><p>右指针 <code>r</code> 最多走 <code>n</code> 步，左指针 <code>l</code> 在整个过程中也最多走 <code>n</code> 步，每个字符最多被插入和删除一次，因此总复杂度是线性级别。</p><h3 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h3><p><code>O(k)</code>，其中 <code>k</code> 是字符集大小（或窗口内不同字符数的上限）。</p><p>这里主要额外空间来自 <code>unordered_set&lt;char&gt;</code>。</p><hr><h2 id="总结：滑动窗口通用模板"><a href="#总结：滑动窗口通用模板" class="headerlink" title="总结：滑动窗口通用模板"></a>总结：滑动窗口通用模板</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//外层循环扩展右边界，内层循环扩展左边界</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> l = <span class="number">0</span>, r = <span class="number">0</span> ; r &lt; n ; r++) &#123;</span><br><span class="line">    <span class="comment">//当前考虑的元素</span></span><br><span class="line">    <span class="keyword">while</span> (l &lt;= r &amp;&amp; <span class="built_in">check</span>()) &#123;<span class="comment">//区间[left,right]不符合题意</span></span><br><span class="line">        <span class="comment">//扩展左边界</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//区间[left,right]符合题意，统计相关信息</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><hr><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(string s)</span> </span>&#123;</span><br><span class="line">        unordered_set&lt;<span class="type">char</span>&gt; str;</span><br><span class="line">        <span class="type">int</span> n=s.<span class="built_in">size</span>();</span><br><span class="line">        <span class="type">int</span> ans=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> l= <span class="number">0</span>,r = <span class="number">0</span>;r&lt;n;r++)&#123;</span><br><span class="line">            <span class="keyword">while</span>(l&lt;=r &amp;&amp; str.<span class="built_in">count</span>(s[r]))&#123;</span><br><span class="line">                str.<span class="built_in">erase</span>(s[l]);</span><br><span class="line">                l++;</span><br><span class="line">            &#125;</span><br><span class="line">            str.<span class="built_in">insert</span>(s[r]);</span><br><span class="line">            ans=<span class="built_in">max</span>(ans,r-l<span class="number">+1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 分享 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机 </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>力扣题解：接雨水</title>
       <link href="/2026/04/30/jie-yu-shui/"/>
       <url>/2026/04/30/jie-yu-shui/</url>
