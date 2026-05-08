@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>力扣题解：滑动窗口最大值</title>
+      <link href="/2026/05/08/leetcode-20260508-sliding-window-maximum/"/>
+      <url>/2026/05/08/leetcode-20260508-sliding-window-maximum/</url>
+      
+        <content type="html"><![CDATA[<h1 id="力扣题解：滑动窗口最大值"><a href="#力扣题解：滑动窗口最大值" class="headerlink" title="力扣题解：滑动窗口最大值"></a>力扣题解：滑动窗口最大值</h1><h2 id="题目链接"><a href="#题目链接" class="headerlink" title="题目链接"></a>题目链接</h2><p><a href="https://leetcode.cn/problems/sliding-window-maximum/description/?envType=study-plan-v2&envId=top-100-liked">点击查看题目</a></p><hr><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>这份代码使用双端队列维护一个“下标递减队列”（对应值从大到小），让队首始终是当前窗口最大值的下标。</p><ol><li>定义 <code>deque&lt;int&gt; q</code>，队列里存的是下标，不直接存数值，便于判断元素是否已经滑出窗口。</li><li>先处理前 <code>k</code> 个元素构造第一个窗口：<ul><li>当新元素 <code>nums[i]</code> 大于等于队尾下标对应的值时，不断弹出队尾；</li><li>然后把当前下标 <code>i</code> 入队。<br>这样队列从队首到队尾对应的值单调不增。</li></ul></li><li>第一个窗口处理完成后，队首下标对应的值就是窗口最大值，先放入 <code>ans</code>。</li><li>从下标 <code>k</code> 开始滑动窗口。每次进入一个新元素时：<ul><li>先按同样规则弹出所有比新元素小（或相等）的队尾下标；</li><li>把新下标入队。</li></ul></li><li>再检查队首是否已经离开窗口：如果 <code>q.front() &lt;= i - k</code>，说明它不在当前窗口范围内，弹出队首。</li><li>此时队首就是当前窗口最大值下标，把 <code>nums[q.front()]</code> 加入答案。</li><li>遍历结束后返回 <code>ans</code>。</li></ol><p>关键点是：每个下标最多进队一次、出队一次，因此能在线性时间内完成全部窗口最大值计算。</p><hr><h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><h3 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h3><p><code>O(n)</code>，其中 <code>n</code> 是数组长度。每个元素最多被压入和弹出双端队列各一次，总操作数与 <code>n</code> 成正比。</p><h3 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h3><p><code>O(k)</code>。双端队列中最多保留当前窗口相关下标，数量不超过窗口大小 <code>k</code>。</p><hr><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">maxSlidingWindow</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums, <span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> n = nums.<span class="built_in">size</span>();</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; k; ++i) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!q.<span class="built_in">empty</span>() &amp;&amp; nums[i] &gt;= nums[q.<span class="built_in">back</span>()]) &#123;</span><br><span class="line">                q.<span class="built_in">pop_back</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            q.<span class="built_in">push_back</span>(i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        vector&lt;<span class="type">int</span>&gt; ans = &#123;nums[q.<span class="built_in">front</span>()]&#125;;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = k; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!q.<span class="built_in">empty</span>() &amp;&amp; nums[i] &gt;= nums[q.<span class="built_in">back</span>()]) &#123;</span><br><span class="line">                q.<span class="built_in">pop_back</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            q.<span class="built_in">push_back</span>(i);</span><br><span class="line">            <span class="keyword">while</span> (q.<span class="built_in">front</span>() &lt;= i - k) &#123;</span><br><span class="line">                q.<span class="built_in">pop_front</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            ans.<span class="built_in">push_back</span>(nums[q.<span class="built_in">front</span>()]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 分享 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机基础 </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>力扣题解：和为 K 的子数组</title>
       <link href="/2026/05/05/leetcode-20260505-subarray-sum-equals-k/"/>
       <url>/2026/05/05/leetcode-20260505-subarray-sum-equals-k/</url>
