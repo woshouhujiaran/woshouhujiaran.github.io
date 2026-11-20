@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>AI Coding入门</title>
+      <link href="/2026/11/20/ai-coding-intro/"/>
+      <url>/2026/11/20/ai-coding-intro/</url>
+
+        <content type="html"><![CDATA[<p>给 Codex 一句“为登录接口补回归测试”，它要先知道项目把测试放在哪，再看工单确认预期行为，最后还得跑一遍测试。目录约定、测试步骤、工单内容和自动检查，分别在不同的时候派上用场。</p><h2 id="先看图：五个模块什么时候用"><a href="#先看图：五个模块什么时候用" class="headerlink" title="先看图：五个模块什么时候用"></a>先看图：五个模块什么时候用</h2><p><a href="/img/ai-coding-intro.png"><img src="/img/ai-coding-intro.png" alt="AI Coding 知识图谱：任务开始时加载 AGENTS.md，执行中按需使用 Skills、Subagents 和 MCP，命中生命周期事件时运行 Hooks"></a></p><p>顺着图从上往下看，先是项目规则，再是任务中按需使用的三种能力。Hooks 单独看，它可以挂在启动、提交提示词、工具调用前后或准备结束等多个时点。比如这次补测试只需要查一条工单，主 Agent 可以自己查，无须拆子任务。</p><h2 id="进项目先读规则：AGENTS-md"><a href="#进项目先读规则：AGENTS-md" class="headerlink" title="进项目先读规则：AGENTS.md"></a>进项目先读规则：AGENTS.md</h2><p>登录回归测试应该放在哪、哪些目录不能动、最后跑哪条命令，这类每次都要遵守的约定适合写进 <code>AGENTS.md</code>。规则越具体，越容易执行和核对，例如「把 HTTP 回归用例放进 <code>tests/integration/</code>」。</p><p>Codex 启动时读取个人规则，再沿项目根目录到当前工作目录逐层加载。遇到冲突时，优先采用离当前目录更近的规则。同一目录优先选 <code>AGENTS.override.md</code>。如果从仓库根目录启动，后来才去改子目录文件，读取那个文件本身不会重新加载规则链。要验证某个子目录的专属规则，可以从该目录启动新会话。</p><h2 id="任务进行时：按需找流程、派人、取数据"><a href="#任务进行时：按需找流程、派人、取数据" class="headerlink" title="任务进行时：按需找流程、派人、取数据"></a>任务进行时：按需找流程、派人、取数据</h2><h3 id="Skills：遇到同类任务，按已有流程做"><a href="#Skills：遇到同类任务，按已有流程做" class="headerlink" title="Skills：遇到同类任务，按已有流程做"></a>Skills：遇到同类任务，按已有流程做</h3><p>团队如果经常补回归测试，可以把「确认复现条件、复用测试夹具、执行对应测试」整理到 <code>SKILL.md</code>，需要时再附脚本或模板。Codex 先看到 Skill 的名称和描述，用户点名或任务与描述匹配时，才加载完整流程。共享流程可以放在项目的 <code>.agents/skills/</code>。</p><h3 id="Subagents：有独立的分支工作，就分开查"><a href="#Subagents：有独立的分支工作，就分开查" class="headerlink" title="Subagents：有独立的分支工作，就分开查"></a>Subagents：有独立的分支工作，就分开查</h3><p>如果登录问题要同时梳理接口代码和现有测试覆盖，可以明确让两个 Subagents 分头调查。主 Agent 给出目标和边界，两个子任务各用独立的上下文工作，再把结论与依据交回主 Agent 汇总。</p><p>临时分工可以直接派发，经常重复的职责可以在 <code>.codex/agents/</code> 定义成自定义角色。独立上下文仍可能共用工作区。多路都要改代码时，可以给不同顶层任务分配 Git Worktree，让它们各有一个工作目录。</p><h3 id="MCP：资料在仓库外，就调用已接入的工具"><a href="#MCP：资料在仓库外，就调用已接入的工具" class="headerlink" title="MCP：资料在仓库外，就调用已接入的工具"></a>MCP：资料在仓库外，就调用已接入的工具</h3><p>假设登录成功和失败的预期写在 GitHub Issue 里。接入并授权 GitHub 工具后，Codex 可以按需查询工单，把结果用到测试里。MCP（模型上下文协议）让 Codex 用统一的方式发现和调用外部能力。Codex 作为 Host 选择工具，MCP Client 负责传递请求，MCP Server 执行查询并返回结果。服务端还可以提供可读取的资源和可复用的提示模板。</p><h2 id="命中事件就检查：Hooks"><a href="#命中事件就检查：Hooks" class="headerlink" title="命中事件就检查：Hooks"></a>命中事件就检查：Hooks</h2><p>如果团队要求每次任务收尾都跑检查，可以把命令绑定到 <code>Stop</code> 事件。Codex 准备结束时会调用已配置的处理程序。如果检查发现登录用例失败，处理程序可以把失败摘要交回 Codex，要求它继续处理。</p><table><thead><tr><th>事件</th><th>触发时机</th><th>可以做什么</th></tr></thead><tbody><tr><td><code>SessionStart</code></td><td>会话启动</td><td>加载环境信息</td></tr><tr><td><code>UserPromptSubmit</code></td><td>用户提交提示词</td><td>补充任务上下文</td></tr><tr><td><code>PreToolUse</code></td><td>支持的工具执行前</td><td>检查待执行的命令</td></tr><tr><td><code>PostToolUse</code></td><td>支持的工具执行后</td><td>记录结果或继续校验</td></tr><tr><td><code>Stop</code></td><td>Codex 准备结束本轮</td><td>执行测试或检查脚本</td></tr></tbody></table><p>一个 Hook 要写清监听的事件、匹配条件和处理程序。以命令型 Hook 为例，Codex 通过标准输入传递事件信息和工作目录，处理程序通过退出码或 JSON 返回结果。结果能影响什么，取决于挂载的事件。</p><p>回到这次登录测试，项目规则决定用例放在哪，Skill 帮你复用测试步骤，MCP 从工单取预期行为，Stop Hook 在收尾时检查。有额外调查可以独立进行时，再考虑交给 Subagents。</p><h2 id="出处"><a href="#出处" class="headerlink" title="出处"></a>出处</h2><p><a href="https://xiaolinnote.com/codex/basics/codex_engineering.html">小林 coding《Codex 工程化指南：AGENTS.md、Skills、Subagents、MCP、Hooks 一篇讲透》</a></p>]]></content>
+
+
+      <categories>
+
+          <category> 技术 </category>
+
+      </categories>
+
+
+        <tags>
+
+            <tag> Agent </tag>
+
+            <tag> Codex </tag>
+
+        </tags>
+
+    </entry>
+
+
+
+    <entry>
       <title>Transformer 学习笔记：注意力机制到底在算什么</title>
       <link href="/2026/10/22/transformer-xue-xi-bi-ji/"/>
       <url>/2026/10/22/transformer-xue-xi-bi-ji/</url>
